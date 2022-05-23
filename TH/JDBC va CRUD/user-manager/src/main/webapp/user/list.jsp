@@ -17,6 +17,11 @@
     <h1>User Management</h1>
     <h2>
         <a href="/users?action=create">Add New User</a>
+        <div>
+            Nhap vao ten can tim
+            <input type="text" name="name">
+            <a href="/users?action=find">Ten can tim</a>
+        </div>
     </h2>
 </center>
 <div align="center">

@@ -16,6 +16,7 @@ public class UserDAO implements IUserDAO{
     private static final String SELECT_ALL_USERS = "select * from users";
     private static final String DELETE_USERS_SQL = "delete from users where id = ?;";
     private static final String UPDATE_USERS_SQL = "update users set name = ?,email= ?, country =? where id = ?;";
+    private static final String FIND_USER_BY_COUNTRY = "select id, name, email, country from users where country =?";
 
     public UserDAO() {
     }
@@ -88,6 +89,24 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
+    public User findByName(String name) {
+        User user = new User();
+        try (Connection connection = getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_COUNTRY);){
+            System.out.println(preparedStatement);
+            preparedStatement.setString(1,name);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                name = rs.getString("name");
+                user = new User(name);
+            }
+         } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return user;
+    }
+
+    @Override
     public boolean deleteUser(int id) throws SQLException {
         boolean rowDeleted;
         try (Connection connection = getConnection();
@@ -101,16 +120,17 @@ public class UserDAO implements IUserDAO{
     @Override
     public boolean updateUser(User user) throws SQLException {
         boolean rowUpdated;
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(UPDATE_USERS_SQL);) {
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_USERS_SQL);) {
             statement.setString(1, user.getName());
             statement.setString(2, user.getEmail());
             statement.setString(3, user.getCountry());
             statement.setInt(4, user.getId());
-
             rowUpdated = statement.executeUpdate() > 0;
         }
         return rowUpdated;
     }
+
 
     private void printSQLException(SQLException ex) {
         for (Throwable e : ex) {

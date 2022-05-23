@@ -81,19 +81,29 @@ public class UserServlet extends HttpServlet {
                 case "edit":
                     updateUser(request, response);
                     break;
+                case "find":
+                    findUserByName(request, response);
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);
         }
     }
 
+    private void findUserByName(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String name  = request.getParameter("name");
+        userDAO.findByName(name);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("user/find.jsp");
+        requestDispatcher.forward(request, response);
+    }
+
     private void updateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String country = request.getParameter("country");
-        User newUser = new User(name, email, country);
+        User newUser = new User(id, name, email, country);
         userDAO.updateUser(newUser);
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("user/create.jsp");
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("user/edit.jsp");
         requestDispatcher.forward(request, response);
     }
 
